@@ -370,3 +370,433 @@ ON Alunos.id_aluno = Matriculas.id_aluno
 GROUP BY nome
 HAVING AVG(nota) >  7
 ORDER BY AVG(nota) DESC;
+
+
+________________________________________________________________________________________________________
+
+(27/05)
+
+use HospitalDB;
+
+SELECT * FROM `Medicos`;    
+
+-- =========================================================
+-- POPULAÇÃO DO BANCO HospitalDB
+-- =========================================================
+
+USE HospitalDB;
+
+-- =========================================================
+-- HOSPITAIS
+-- =========================================================
+
+INSERT INTO Hospitais
+(nome, cidade, estado, endereco)
+VALUES
+('Hospital São Lucas', 'Joinville', 'SC', 'Rua das Flores, 120'),
+('Hospital Vida Nova', 'Curitiba', 'PR', 'Av. Central, 450'),
+('Hospital Santa Clara', 'Florianópolis', 'SC', 'Rua Beira Mar, 900'),
+('Hospital Esperança', 'Blumenau', 'SC', 'Rua XV de Novembro, 88'),
+('Hospital Saúde Total', 'Porto Alegre', 'RS', 'Av. Brasil, 300');
+
+-- =========================================================
+-- ESPECIALIDADES
+-- =========================================================
+
+INSERT INTO Especialidades
+(nome)
+VALUES
+('Cardiologia'),
+('Ortopedia'),
+('Pediatria'),
+('Neurologia'),
+('Clínico Geral');
+
+-- =========================================================
+-- MÉDICOS
+-- =========================================================
+
+INSERT INTO Medicos
+(nome, crm, telefone, email, salario,
+ id_especialidade, id_hospital)
+VALUES
+('Carlos Mendes', 'CRM1001', '47999990001',
+ 'carlos@hospital.com', 18000.00, 1, 1),
+
+('Fernanda Lima', 'CRM1002', '47999990002',
+ 'fernanda@hospital.com', 22000.00, 2, 1),
+
+('Ricardo Alves', 'CRM1003', '41999990003',
+ 'ricardo@hospital.com', 19500.00, 3, 2),
+
+('Patricia Souza', 'CRM1004', '48999990004',
+ 'patricia@hospital.com', 25000.00, 4, 3),
+
+('Juliana Costa', 'CRM1005', '47999990005',
+ 'juliana@hospital.com', 17000.00, 5, 4);
+
+-- =========================================================
+-- PACIENTES
+-- =========================================================
+
+INSERT INTO Pacientes
+(nome, cpf, data_nascimento,
+ telefone, email, endereco,
+ tipo_sanguineo, alergias)
+VALUES
+('João Pedro', '11111111111',
+ '2000-05-10', '47988880001',
+ 'joao@email.com',
+ 'Rua Azul, 100',
+ 'O+', 'Dipirona'),
+
+('Mariana Silva', '22222222222',
+ '1995-08-15', '47988880002',
+ 'mariana@email.com',
+ 'Rua Verde, 220',
+ 'A+', 'Nenhuma'),
+
+('Lucas Almeida', '33333333333',
+ '1988-12-01', '47988880003',
+ 'lucas@email.com',
+ 'Rua Vermelha, 50',
+ 'B-', 'Amendoim'),
+
+('Ana Costa', '44444444444',
+ '2002-03-20', '47988880004',
+ 'ana@email.com',
+ 'Rua das Palmeiras, 77',
+ 'AB+', 'Penicilina'),
+
+('Bruno Rocha', '55555555555',
+ '1990-11-11', '47988880005',
+ 'bruno@email.com',
+ 'Av. Central, 500',
+ 'O-', 'Nenhuma');
+
+-- =========================================================
+-- CONVÊNIOS
+-- =========================================================
+
+INSERT INTO Convenios
+(nome, telefone, cobertura)
+VALUES
+('Unimed', '0800111111',
+ 'Consultas e exames'),
+
+('Bradesco Saúde', '0800222222',
+ 'Internações e cirurgias'),
+
+('SulAmérica', '0800333333',
+ 'Cobertura nacional'),
+
+('Amil', '0800444444',
+ 'Consultas, exames e internações'),
+
+('Particular', '0800555555',
+ 'Sem cobertura');
+
+-- =========================================================
+-- PACIENTE CONVÊNIO
+-- =========================================================
+
+INSERT INTO PacienteConvenio
+(id_paciente, id_convenio, numero_carteira)
+VALUES
+(1,1,'UNI123456'),
+(2,2,'BRA987654'),
+(3,3,'SUL456789'),
+(4,4,'AMI654321'),
+(5,5,'PAR111222');
+
+-- =========================================================
+-- CONSULTAS
+-- =========================================================
+
+INSERT INTO Consultas
+(data_consulta, diagnostico,
+ observacoes, valor,
+ id_paciente, id_medico)
+VALUES
+('2025-08-01 10:00:00',
+ 'Hipertensão',
+ 'Paciente apresentou pressão elevada',
+ 250.00, 1, 1),
+
+('2025-08-02 14:00:00',
+ 'Fratura no braço',
+ 'Necessário imobilização',
+ 450.00, 2, 2),
+
+('2025-08-03 09:30:00',
+ 'Gripe',
+ 'Repouso recomendado',
+ 180.00, 3, 3),
+
+('2025-08-04 16:00:00',
+ 'Enxaqueca',
+ 'Solicitado exame complementar',
+ 320.00, 4, 4),
+
+('2025-08-05 11:15:00',
+ 'Check-up',
+ 'Paciente saudável',
+ 200.00, 5, 5);
+
+-- =========================================================
+-- MEDICAMENTOS
+-- =========================================================
+
+INSERT INTO Medicamentos
+(nome, fabricante, estoque, preco)
+VALUES
+('Dipirona', 'EMS', 150, 12.50),
+('Amoxicilina', 'Medley', 80, 35.90),
+('Paracetamol', 'Neo Química', 200, 8.90),
+('Ibuprofeno', 'Cimed', 120, 15.40),
+('Omeprazol', 'Eurofarma', 90, 22.00);
+
+-- =========================================================
+-- RECEITAS
+-- =========================================================
+
+INSERT INTO Receitas
+(id_consulta, data_receita, observacoes)
+VALUES
+(1, '2025-08-01', 'Tomar após refeições'),
+(2, '2025-08-02', 'Uso por 7 dias'),
+(3, '2025-08-03', 'Uso contínuo'),
+(4, '2025-08-04', 'Evitar esforço físico'),
+(5, '2025-08-05', 'Apenas se necessário');
+
+-- =========================================================
+-- RECEITA MEDICAMENTO
+-- =========================================================
+
+INSERT INTO ReceitaMedicamento
+(id_receita, id_medicamento,
+ dosagem, frequencia)
+VALUES
+(1,1,'500mg','8 em 8 horas'),
+(2,2,'1 cápsula','12 em 12 horas'),
+(3,3,'750mg','6 em 6 horas'),
+(4,4,'400mg','8 em 8 horas'),
+(5,5,'20mg','1 vez ao dia');
+
+-- =========================================================
+-- EXAMES
+-- =========================================================
+
+INSERT INTO Exames
+(nome, resultado, data_exame,
+ id_paciente, id_medico)
+VALUES
+('Hemograma',
+ 'Sem alterações',
+ '2025-08-01', 1, 1),
+
+('Raio-X',
+ 'Fratura confirmada',
+ '2025-08-02', 2, 2),
+
+('Teste Covid',
+ 'Negativo',
+ '2025-08-03', 3, 3),
+
+('Ressonância',
+ 'Sem anomalias',
+ '2025-08-04', 4, 4),
+
+('Check-up sanguíneo',
+ 'Normal',
+ '2025-08-05', 5, 5);
+
+-- =========================================================
+-- QUARTOS
+-- =========================================================
+
+INSERT INTO Quartos
+(numero, tipo, capacidade,
+ status_quarto, id_hospital)
+VALUES
+('101', 'UTI', 1, 'Ocupado', 1),
+('102', 'Enfermaria', 2, 'Livre', 1),
+('201', 'Apartamento', 1, 'Livre', 2),
+('202', 'UTI', 1, 'Manutenção', 3),
+('301', 'Enfermaria', 3, 'Ocupado', 4);
+
+-- =========================================================
+-- INTERNAÇÕES
+-- =========================================================
+
+INSERT INTO Internacoes
+(data_entrada, data_saida,
+ motivo, id_paciente, id_quarto)
+VALUES
+('2025-08-01 08:00:00',
+ '2025-08-05 10:00:00',
+ 'Cirurgia cardíaca', 1, 1),
+
+('2025-08-02 09:00:00',
+ '2025-08-06 14:00:00',
+ 'Fratura grave', 2, 2),
+
+('2025-08-03 10:00:00',
+ NULL,
+ 'Observação clínica', 3, 3),
+
+('2025-08-04 12:00:00',
+ '2025-08-07 09:00:00',
+ 'Crise de enxaqueca', 4, 4),
+
+('2025-08-05 07:00:00',
+ NULL,
+ 'Exames complementares', 5, 5);
+
+-- =========================================================
+-- SETORES
+-- =========================================================
+
+INSERT INTO Setores
+(nome)
+VALUES
+('Recepção'),
+('TI'),
+('Financeiro'),
+('Enfermagem'),
+('Administração');
+
+-- =========================================================
+-- FUNCIONÁRIOS
+-- =========================================================
+
+INSERT INTO Funcionarios
+(nome, cpf, cargo,
+ salario, id_setor, id_hospital)
+VALUES
+('Roberto Silva', '66666666666',
+ 'Recepcionista', 3200.00, 1, 1),
+
+('Camila Souza', '77777777777',
+ 'Analista de TI', 5500.00, 2, 1),
+
+('Paulo Mendes', '88888888888',
+ 'Auxiliar Financeiro', 4200.00, 3, 2),
+
+('Juliana Alves', '99999999999',
+ 'Enfermeira', 6200.00, 4, 3),
+
+('Felipe Rocha', '10101010101',
+ 'Administrador', 7500.00, 5, 4);
+
+-- =========================================================
+-- PAGAMENTOS
+-- =========================================================
+
+INSERT INTO Pagamentos
+(valor, data_pagamento,
+ forma_pagamento, id_consulta)
+VALUES
+(250.00, '2025-08-01', 'Cartão', 1),
+(450.00, '2025-08-02', 'PIX', 2),
+(180.00, '2025-08-03', 'Dinheiro', 3),
+(320.00, '2025-08-04', 'Cartão', 4),
+(200.00, '2025-08-05', 'PIX', 5);
+
+-- =========================================================
+-- USUÁRIOS DO SISTEMA
+-- =========================================================
+
+INSERT INTO UsuariosSistema
+(usuario, senha_hash, nivel_acesso)
+VALUES
+('admin',
+'123hashadmin',
+'Administrador'),
+
+('medico01',
+'123hashmedico',
+'Médico'),
+
+('recepcao01',
+'123hashrecepcao',
+'Recepção'),
+
+('financeiro01',
+'123hashfinanceiro',
+'Financeiro'),
+
+('ti01',
+'123hashti',
+'TI');
+
+-- =========================================================
+-- LOGS
+-- =========================================================
+
+INSERT INTO Logs
+(acao, data_log, id_usuario)
+VALUES
+('Login no sistema',
+ '2025-08-01 08:00:00', 1),
+
+('Cadastro de paciente',
+ '2025-08-01 08:10:00', 3),
+
+('Atualização de consulta',
+ '2025-08-02 14:30:00', 2),
+
+('Registro de pagamento',
+ '2025-08-03 16:00:00', 4),
+
+('Backup do banco executado',
+ '2025-08-04 23:00:00', 5);
+
+SELECT * FROM Pacientes
+where tipo_sanguineo =  'A+';
+
+SELECT Medicos.nome,
+        Medicos.crm,
+        Especialidades.nome,
+        Hospitais.nome,
+        COUNT(Consultas.id_consulta)
+FROM Medicos, Especialidades, Hospitais, `Consultas`
+WHERE Medicos.id_especialidade = Especialidades.id_especialidade
+and Medicos.id_hospital = 2
+and Hospitais.id_hospital = Medicos.id_hospital
+and Consultas.id_medico = Medicos.id_medico
+GROUP BY Medicos.nome, Medicos.crm, Especialidades.nome, Hospitais.nome;
+
+SELECT M.nome,
+M.crm,
+E.nome,
+MAX(M.salario)
+FROM `Medicos` AS M
+JOIN `Especialidades` AS E
+ON M.id_especialidade = E.id_especialidade
+GROUP BY M.nome, M.crm, E.id_especialidade
+ORDER BY MAX(M.salario);
+
+SELECT M.nome,
+M.salario,
+E.nome,
+M.telefone,
+H.nome as hp
+FROM `Medicos` AS M
+JOIN `Especialidades` AS E ON M.id_especialidade = E.id_especialidade
+JOIN `Hospitais` as H on M.id_medico = `H`.id_hospital;
+
+SELECT M.nome, M.email, E.nome, COUNT(C.id_consulta), M.salario
+FROM Medicos AS M 
+JOIN Especialidades AS E 
+ON M.id_especialidade = E.id_especialidade
+JOIN Consultas AS C 
+ON M.id_medico = C.id_medico
+GROUP BY M.id_medico;
+
+SELECT M.nome, M.email, M.telefone, E.nome as especialidade, H.nome as Hospital, COUNT(Exames.id_exame) as Exames_solicitados
+FROM Medicos as M
+JOIN Especialidades AS E ON M.id_especialidade = E.id_especialidade
+JOIN Hospitais AS H ON M.id_hospital = H.id_hospital
+JOIN Exames ON M.id_medico = Exames.id_medico
+GROUP BY M.id_medico;
