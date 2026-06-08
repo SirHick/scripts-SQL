@@ -800,3 +800,296 @@ JOIN Especialidades AS E ON M.id_especialidade = E.id_especialidade
 JOIN Hospitais AS H ON M.id_hospital = H.id_hospital
 JOIN Exames ON M.id_medico = Exames.id_medico
 GROUP BY M.id_medico;
+
+(08/06)
+use EscolaDB;
+
+-- ======== Questões Básicas — Subquery como filtro ========
+
+-- Liste os alunos que possuem a maior idade cadastrada.
+SELECT * FROM `Alunos`
+WHERE idade = (SELECT MAX(idade) FROM `Alunos`);
+
+-- Exiba os alunos que possuem idade menor que a média das idades.
+SELECT nome, idade FROM `Alunos`
+WHERE idade < (SELECT AVG(idade) FROM `Alunos`);
+
+-- Mostre os cursos que possuem a maior carga horária.
+SELECT * FROM `Cursos`
+WHERE carga_horaria = (SELECT MAX(carga_horaria) FROM `Cursos`);
+
+-- Liste os alunos que possuem nota igual à maior nota registrada nas matrículas.
+SELECT a.*, m.nota
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+WHERE m.nota = (SELECT MAX(nota) FROM `Matriculas`);
+
+-- Exiba os alunos que possuem nota menor que a média geral das notas.
+
+SELECT a.nome, m.nota
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+WHERE m.nota < (SELECT AVG(nota) FROM `Matriculas`);
+
+-- Mostre os cursos cuja carga horária seja maior que a média das cargas horárias.
+
+SELECT `Cursos`.carga_horaria, nome_curso
+FROM `Cursos`
+WHERE carga_horaria > (SELECT AVG(carga_horaria) FROM `Cursos`);
+
+-- Liste os alunos que possuem exatamente a menor idade cadastrada.
+
+SELECT `Alunos`.nome, idade
+FROM `Alunos`
+WHERE idade = (SELECT MIN(idade) FROM `Alunos`);
+
+-- Exiba as matrículas cuja quantidade de faltas seja maior que a média de faltas.
+
+SELECT `Matriculas`.id_matricula, Alunos.nome,`Matriculas`.faltas
+FROM `Matriculas`, `Alunos`
+WHERE faltas > (SELECT AVG(faltas) FROM `Matriculas`);
+
+-- Mostre os cursos que possuem carga horária diferente da maior carga horária.
+
+SELECT * FROM `Cursos`
+WHERE carga_horaria <> (SELECT MAX(carga_horaria) FROM `Cursos`);
+
+-- Liste os alunos que possuem nota igual à menor nota registrada.
+
+SELECT * FROM `Matriculas`
+WHERE nota = (SELECT MIN(nota) FROM `Matriculas`);
+
+
+-- ============= Questões Intermediárias — Subquery com IN ==================
+
+-- Liste os nomes dos alunos que possuem matrícula cadastrada.
+SELECT nome FROM `Alunos`
+WHERE id_aluno IN (SELECT id_aluno FROM `Matriculas`);
+
+-- Exiba os cursos que possuem alunos matriculados.
+SELECT * FROM `Cursos`
+WHERE id_curso IN (SELECT id_curso FROM `Matriculas`);
+
+-- Mostre os alunos que estão matriculados no curso “Python”.
+SELECT * FROM `Alunos`
+WHERE id_aluno IN (
+    SELECT id_aluno FROM `Matriculas` 
+    WHERE id_curso IN (SELECT id_curso FROM `Cursos` WHERE nome_curso = 'Python')
+);
+
+-- Liste os alunos matriculados em cursos com carga horária maior que 60 horas.
+SELECT * FROM `Alunos`
+WHERE id_aluno IN (
+    SELECT id_aluno FROM `Matriculas` 
+    WHERE id_curso IN (SELECT id_curso FROM `Cursos` WHERE carga_horaria > 60)
+);
+
+-- Exiba os cursos nos quais existem alunos com nota maior que 8.
+SELECT * FROM `Cursos`
+WHERE id_curso IN (SELECT id_curso FROM `Matriculas` WHERE nota > 8);
+
+-- Mostre os alunos que possuem mais de uma matrícula.
+SELECT * FROM `Alunos`
+WHERE id_aluno IN (
+    SELECT id_aluno FROM `Matriculas` 
+    GROUP BY id_aluno 
+    HAVING COUNT(*) > 1
+);
+
+-- Liste os cursos que NÃO possuem matrículas cadastradas.
+SELECT * FROM `Cursos`
+WHERE id_curso NOT IN (SELECT id_curso FROM `Matriculas`);
+
+-- Exiba os alunos que possuem faltas maiores que 5 em alguma matrícula.
+SELECT * FROM `Alunos`
+WHERE id_aluno IN (SELECT id_aluno FROM `Matriculas` WHERE faltas > 5);
+
+-- Mostre os cursos frequentados por alunos da cidade de Curitiba.
+SELECT * FROM `Cursos`
+WHERE id_curso IN (
+    SELECT id_curso FROM `Matriculas` 
+    WHERE id_aluno IN (SELECT id_aluno FROM `Alunos` WHERE cidade = 'Curitiba')
+);
+
+-- Liste os alunos matriculados no curso com maior carga horária.
+SELECT * FROM `Alunos`
+WHERE id_aluno IN (
+    SELECT id_aluno FROM `Matriculas` 
+    WHERE id_curso IN (SELECT id_curso FROM `Cursos` WHERE carga_horaria = (SELECT MAX(carga_horaria) FROM `Cursos`))
+);
+
+
+-- ============= Questões Avançadas — Subquery com operadores de comparação ==================
+
+-- Exiba os alunos cuja idade seja maior que a média de idade dos alunos de São Paulo.
+SELECT * FROM `Alunos`
+WHERE idade > (SELECT AVG(idade) FROM `Alunos` WHERE cidade = 'São Paulo');
+
+-- Liste os cursos cuja média de notas seja maior que a média geral das notas.
+SELECT c.* FROM `Cursos` c
+WHERE (SELECT AVG(nota) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) > (SELECT AVG(nota) FROM `Matriculas`);
+
+-- Mostre os alunos cuja soma de faltas seja maior que a média total de faltas registradas.
+SELECT a.* FROM `Alunos` a
+WHERE (SELECT SUM(faltas) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) > (SELECT AVG(faltas) FROM `Matriculas`);
+
+-- Exiba os cursos cuja maior nota registrada seja igual à maior nota do sistema.
+SELECT c.* FROM `Cursos` c
+WHERE (SELECT MAX(nota) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) = (SELECT MAX(nota) FROM `Matriculas`);
+
+-- Liste os alunos cuja média de notas seja menor que a média geral dos alunos.
+SELECT a.* FROM `Alunos` a
+WHERE (SELECT AVG(nota) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) < (SELECT AVG(nota) FROM `Matriculas`);
+
+-- Mostre os cursos cuja quantidade de matrículas seja maior que a média de matrículas por curso.
+SELECT c.* FROM `Cursos` c
+WHERE (SELECT COUNT(*) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) > (SELECT COUNT(*) / COUNT(DISTINCT id_curso) FROM `Matriculas`);
+
+-- Exiba os alunos que possuem nota maior que todas as notas do curso “Banco de Dados”.
+SELECT a.* FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+WHERE m.nota > ALL (
+    SELECT m2.nota FROM `Matriculas` m2 
+    JOIN `Cursos` c ON m2.id_curso = c.id_curso 
+    WHERE c.nome_curso = 'Banco de Dados'
+);
+
+-- Liste os cursos cuja menor nota seja maior que a média geral das menores notas dos cursos.
+SELECT c.* FROM `Cursos` c
+WHERE (SELECT MIN(nota) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) > (
+    SELECT AVG(min_nota) FROM (SELECT MIN(nota) AS min_nota FROM `Matriculas` GROUP BY id_curso) AS subquery
+);
+
+-- Mostre os alunos cuja idade seja igual à idade média dos alunos.
+SELECT * FROM `Alunos`
+WHERE idade = (SELECT AVG(idade) FROM `Alunos`);
+
+-- Exiba os cursos cuja carga horária seja menor que a maior carga horária cadastrada.
+SELECT * FROM `Cursos`
+WHERE carga_horaria < (SELECT MAX(carga_horaria) FROM `Cursos`);
+
+
+-- ============= Questões — Subquery como nova coluna ==================
+
+-- Liste os alunos e exiba ao lado a quantidade total de matrículas de cada aluno.
+SELECT nome, (SELECT COUNT(*) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) AS total_matriculas 
+FROM `Alunos` a;
+
+-- Exiba os cursos e mostre ao lado a média das notas de cada curso.
+SELECT nome_curso, (SELECT AVG(nota) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) AS media_notas 
+FROM `Cursos` c;
+
+-- Liste os alunos e mostre a soma total de faltas de cada um.
+SELECT nome, (SELECT SUM(faltas) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) AS total_faltas 
+FROM `Alunos` a;
+
+-- Exiba os cursos e mostre quantos alunos estão matriculados em cada curso.
+SELECT nome_curso, (SELECT COUNT(id_aluno) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) AS total_alunos 
+FROM `Cursos` c;
+
+-- Liste os alunos e apresente sua maior nota registrada.
+SELECT nome, (SELECT MAX(nota) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) AS maior_nota 
+FROM `Alunos` a;
+
+-- Exiba os cursos e mostre a menor nota registrada em cada curso.
+SELECT nome_curso, (SELECT MIN(nota) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) AS menor_nota 
+FROM `Cursos` c;
+
+-- Liste os alunos e mostre a média de notas de cada um em uma nova coluna chamada Media_Aluno.
+SELECT nome, (SELECT AVG(nota) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) AS Media_Aluno 
+FROM `Alunos` a;
+
+-- Exiba os cursos e apresente o total de faltas registradas em cada curso.
+SELECT nome_curso, (SELECT SUM(faltas) FROM `Matriculas` m WHERE m.id_curso = c.id_curso) AS total_faltas 
+FROM `Cursos` c;
+
+-- Liste os alunos e mostre a quantidade de cursos diferentes em que estão matriculados.
+SELECT nome, (SELECT COUNT(DISTINCT id_curso) FROM `Matriculas` m WHERE m.id_aluno = a.id_aluno) AS total_cursos 
+FROM `Alunos` a;
+
+-- Exiba os cursos e mostre a quantidade de alunos aprovados (nota maior ou igual a 7).
+SELECT nome_curso, (SELECT COUNT(*) FROM `Matriculas` m WHERE m.id_curso = c.id_curso AND m.nota >= 7) AS total_aprovados 
+FROM `Cursos` c;
+
+
+-- ============= Questões Desafio — Misturando GROUP BY + HAVING + SUBQUERY ==================
+
+-- Liste as cidades cuja média de idade seja maior que a média geral de idade dos alunos.
+SELECT cidade 
+FROM `Alunos` 
+GROUP BY cidade 
+HAVING AVG(idade) > (SELECT AVG(idade) FROM `Alunos`);
+
+-- Exiba os cursos cuja média de notas seja maior que a média das médias dos cursos.
+SELECT c.nome_curso
+FROM `Cursos` c
+JOIN `Matriculas` m ON c.id_curso = m.id_curso
+GROUP BY c.id_curso, c.nome_curso
+HAVING AVG(m.nota) > (
+    SELECT AVG(media_curso) FROM (SELECT AVG(nota) AS media_curso FROM `Matriculas` GROUP BY id_curso) AS subquery
+);
+
+-- Mostre os alunos cuja soma de faltas seja maior que a soma média de faltas dos alunos.
+SELECT a.nome
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+GROUP BY a.id_aluno, a.nome
+HAVING SUM(m.faltas) > (
+    SELECT AVG(soma_faltas) FROM (SELECT SUM(faltas) AS soma_faltas FROM `Matriculas` GROUP BY id_aluno) AS subquery
+);
+
+-- Liste os cursos que possuem quantidade de matrículas acima da média de matrículas por curso.
+SELECT c.nome_curso 
+FROM `Cursos` c
+JOIN `Matriculas` m ON c.id_curso = m.id_curso
+GROUP BY c.id_curso, c.nome_curso
+HAVING COUNT(*) > (SELECT COUNT(*) / COUNT(DISTINCT id_curso) FROM `Matriculas`);
+
+-- Exiba os alunos cuja média de notas seja maior que a média dos alunos da cidade de São Paulo.
+SELECT a.nome
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+GROUP BY a.id_aluno, a.nome
+HAVING AVG(m.nota) > (
+    SELECT AVG(m2.nota) FROM `Matriculas` m2 JOIN `Alunos` a2 ON m2.id_aluno = a2.id_aluno WHERE a2.cidade = 'São Paulo'
+);
+
+-- Mostre os cursos cuja carga horária seja maior que a média das cargas horárias dos cursos com matrícula.
+SELECT nome_curso 
+FROM `Cursos` 
+GROUP BY id_curso, nome_curso, carga_horaria
+HAVING carga_horaria > (
+    SELECT AVG(carga_horaria) FROM `Cursos` WHERE id_curso IN (SELECT DISTINCT id_curso FROM `Matriculas`)
+);
+
+
+-- Liste os alunos que possuem mais matrículas que a média de matrículas dos alunos.
+SELECT a.nome 
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+GROUP BY a.id_aluno, a.nome
+HAVING COUNT(*) > (SELECT COUNT(*) / COUNT(DISTINCT id_aluno) FROM `Matriculas`);
+
+-- Exiba os cursos cuja maior nota seja inferior à maior nota geral do sistema.
+SELECT c.nome_curso 
+FROM `Cursos` c
+JOIN `Matriculas` m ON c.id_curso = m.id_curso
+GROUP BY c.id_curso, c.nome_curso
+HAVING MAX(m.nota) < (SELECT MAX(nota) FROM `Matriculas`);
+
+-- Mostre os alunos cuja média de faltas seja menor que a média geral de faltas.
+SELECT a.nome
+FROM `Alunos` a
+JOIN `Matriculas` m ON a.id_aluno = m.id_aluno
+GROUP BY a.id_aluno, a.nome
+HAVING AVG(m.faltas) < (SELECT AVG(faltas) FROM `Matriculas`);
+
+-- Liste os cursos cuja quantidade de alunos aprovados seja maior que a média de aprovados dos cursos.
+SELECT c.nome_curso
+FROM `Cursos` c
+JOIN `Matriculas` m ON c.id_curso = m.id_curso
+WHERE m.nota >= 7
+GROUP BY c.id_curso, c.nome_curso
+HAVING COUNT(*) > (
+    SELECT AVG(qtd_aprovados) FROM (SELECT COUNT(*) AS qtd_aprovados FROM `Matriculas` WHERE nota >= 7 GROUP BY id_curso) AS subquery
+);
