@@ -1,0 +1,99 @@
+USE HospitalDB;
+
+-- 1. Liste o nome e a cidade de todos os hospitais cadastrados.
+SELECT nome, cidade 
+FROM Hospitais;
+
+-- 2. Exiba o nome, CRM e salário de todos os médicos.
+SELECT nome, crm, salario 
+FROM Medicos;
+
+-- 3. Liste os pacientes cadastrados com seu tipo sanguíneo.
+SELECT nome, tipo_sanguineo 
+FROM Pacientes;
+
+-- 4. Exiba os medicamentos com estoque inferior a 50 unidades.
+SELECT nome, estoque 
+FROM Medicamentos 
+WHERE estoque < 50;
+
+-- 5. Liste os pacientes que possuem alguma alergia registrada.
+-- Nota: Os registros sem alergia usaram a palavra 'Nenhuma'.
+SELECT nome, alergias 
+FROM Pacientes 
+WHERE alergias <> 'Nenhuma' AND alergias IS NOT NULL;
+
+-- 6. Exiba as consultas realizadas após uma data informada pelo professor.
+-- Substitua '2025-08-02' pela data desejada.
+SELECT * FROM Consultas 
+WHERE data_consulta > '2025-08-02';
+
+-- 7. Liste os exames realizados em um período informado pelo professor.
+-- Substitua as datas para definir o período correto.
+SELECT * FROM Exames 
+WHERE data_exame BETWEEN '2025-08-01' AND '2025-08-04';
+
+-- 8. Exiba os funcionários cujo salário esteja entre R$ 2.500,00 e R$ 6.000,00.
+SELECT nome, cargo, salario 
+FROM Funcionarios 
+WHERE salario BETWEEN 2500.00 AND 6000.00;
+
+-- 9. Liste os quartos que estão com status "Disponível".
+-- Nota: No banco populado, o status utilizado para disponível foi 'Livre'.
+SELECT numero, tipo, status_quarto 
+FROM Quartos 
+WHERE status_quarto = 'Livre';
+
+-- 10. Exiba os pagamentos realizados utilizando uma forma de pagamento informada pelo professor.
+-- Substitua 'PIX' pela forma de pagamento desejada (ex: 'Cartão', 'Dinheiro').
+SELECT * FROM Pagamentos 
+WHERE forma_pagamento = 'PIX';
+
+-- 11. Apresente a quantidade total de pacientes cadastrados.
+SELECT COUNT(*) AS total_pacientes 
+FROM Pacientes;
+
+-- 12. Exiba o valor médio das consultas realizadas.
+SELECT AVG(valor) AS valor_medio_consultas 
+FROM Consultas;
+
+-- 13. Apresente o menor valor de consulta registrado no sistema.
+SELECT MIN(valor) AS menor_valor_consulta 
+FROM Consultas;
+
+-- 14. Exiba a quantidade de médicos cadastrados por especialidade.
+SELECT e.nome AS especialidade, COUNT(m.id_medico) AS quantidade_medicos
+FROM Especialidades e
+LEFT JOIN Medicos m ON e.id_especialidade = m.id_especialidade
+GROUP BY e.nome;
+
+-- 15. Apresente a quantidade de funcionários cadastrados por setor.
+SELECT s.nome AS setor, COUNT(f.id_funcionario) AS quantidade_funcionarios
+FROM Setores s
+LEFT JOIN Funcionarios f ON s.id_setor = f.id_setor
+GROUP BY s.nome;
+
+-- 16. Liste o nome dos médicos e o nome de suas respectivas especialidades.
+SELECT m.nome AS medico, e.nome AS especialidade
+FROM Medicos m
+JOIN Especialidades e ON m.id_especialidade = e.id_especialidade;
+
+-- 17. Exiba o nome dos funcionários e o nome do hospital em que trabalham.
+SELECT f.nome AS funcionario, h.nome AS hospital
+FROM Funcionarios f
+JOIN Hospitais h ON f.id_hospital = h.id_hospital;
+
+-- 18. Liste o nome dos pacientes e as datas de suas consultas.
+SELECT p.nome AS paciente, c.data_consulta
+FROM Pacientes p
+JOIN Consultas c ON p.id_paciente = c.id_paciente;
+
+-- 19. Exiba o(s) medicamento(s) com o maior preço cadastrado.
+SELECT nome, preco 
+FROM Medicamentos 
+WHERE preco = (SELECT MAX(preco) FROM Medicamentos);
+
+-- 20. Liste os médicos cujo salário seja superior ao salário médio dos médicos cadastrados.
+SELECT nome, salario 
+FROM Medicos 
+WHERE salario > (SELECT AVG(salario) FROM Medicos);
